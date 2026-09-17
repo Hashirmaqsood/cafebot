@@ -3,67 +3,66 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CafeBot</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>CafeBot Cafe</title>
+  <link rel="stylesheet" href="home.css" />
 </head>
-<body>
-  <div class="chat-app">
-    <header class="chat-header">
-      <div class="avatar" aria-hidden="true">☕</div>
-      <div class="header-text">
-        <h1>CafeBot</h1>
-        <p class="status">Online</p>
-      </div>
-    </header>
+<body class="home-body">
+  <header class="site-header">
+    <div class="site-header-inner">
+      <div class="brand">☕ CafeBot Cafe</div>
+      <nav class="site-nav">
+        <a href="#menu">Menu</a>
+        <a href="#hours">Hours &amp; Location</a>
+        <a href="demo.html">Full-page chat</a>
+      </nav>
+    </div>
+  </header>
 
-    <main class="chat-area" id="chatArea" aria-live="polite">
-      <!-- Mock messages -->
-      <div class="message bot">
-        <div class="bubble">Hi there! 👋 Welcome to CafeBot. Would you like to see our menu or place an order?</div>
-      </div>
+  <section class="hero">
+    <h1>Great coffee, warm welcome.</h1>
+    <p>Browse our menu below, or chat with CafeBot in the corner to ask questions and place an order.</p>
+    <button class="hero-cta" id="openChatBtn" type="button">Chat with CafeBot</button>
+  </section>
 
-      <div class="message customer">
-        <div class="bubble">Hi! What coffees do you have?</div>
-      </div>
+  <section class="menu-section" id="menu">
+    <h2>Our Menu</h2>
+    <div class="menu-grid" id="menuGrid">Loading menu…</div>
+  </section>
 
-      <div class="message bot">
-        <div class="bubble">We have Classic Drip Coffee, Cappuccino, and Caramel Latte ☕ — all available in Small, Medium, or Large. Want to hear the prices?</div>
-      </div>
+  <section class="hours-section" id="hours">
+    <h2>Hours &amp; Location</h2>
+    <div id="hoursContent">Loading…</div>
+  </section>
 
-      <div class="message customer">
-        <div class="bubble">Yes please, and I'll take a medium caramel latte.</div>
-      </div>
+  <footer class="site-footer">
+    <p>CafeBot demo project — not a real cafe.</p>
+  </footer>
 
-      <div class="message bot">
-        <div class="bubble">Great choice! A Medium Caramel Latte is $4.50. Here's your order so far:<br>• 1 x Medium Caramel Latte — $4.50<br><br>Anything else, or shall I confirm this order?</div>
+  <!-- Floating chat widget -->
+  <div class="chat-widget" id="chatWidget" hidden>
+    <div class="chat-app">
+      <div class="chat-header">
+        <div class="avatar">☕</div>
+        <div class="header-text">
+          <h1>CafeBot</h1>
+          <p class="status">Online</p>
+        </div>
+        <button class="chat-close" id="closeChatBtn" type="button" aria-label="Close chat">✕</button>
       </div>
-
-      <div class="message customer">
-        <div class="bubble">That's all, thanks!</div>
+      <div class="chat-area" id="chatArea">
+        <div class="message bot">
+          <div class="bubble">Hi there! 👋 Welcome to CafeBot. Ask me about the menu, hours, or place an order!</div>
+        </div>
       </div>
-
-      <div class="message bot">
-        <div class="bubble">Here's your order confirmation:<br>• 1 x Medium Caramel Latte — $4.50<br>Total: $4.50<br><br>Does this look right?</div>
-      </div>
-    </main>
-
-    <form class="chat-input-area" id="chatForm">
-      <input
-        type="text"
-        id="chatInput"
-        class="chat-input"
-        placeholder="Type a message..."
-        aria-label="Type a message"
-        autocomplete="off"
-      />
-      <button type="submit" class="send-button" aria-label="Send message">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
-          <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
-        </svg>
-      </button>
-    </form>
+      <form class="chat-input-area" id="chatForm">
+        <input type="text" id="chatInput" class="chat-input" placeholder="Type a message..." autocomplete="off" />
+        <button type="submit" class="send-button" aria-label="Send">➤</button>
+      </form>
+    </div>
   </div>
+  <button class="chat-fab" id="chatFab" type="button" aria-label="Open chat">💬</button>
 
   <script src="script.js"></script>
+  <script src="home.js"></script>
 </body>
 </html>
