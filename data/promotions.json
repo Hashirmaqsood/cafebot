@@ -1,0 +1,39 @@
+{
+  "promotions": [
+    {
+      "id": "promo-001",
+      "name": "Happy Hour Coffee",
+      "rule": "20% off any coffee category item purchased between 2pm and 4pm.",
+      "discount": { "type": "percent", "value": 20, "appliesTo": "coffee" },
+      "eligibility": {
+        "timeWindow": { "start": "14:00", "end": "16:00" },
+        "minItems": 1,
+        "notes": "Applies automatically to coffee items ordered within the time window. Cannot be combined with other promotions."
+      },
+      "active": true
+    },
+    {
+      "id": "promo-002",
+      "name": "Pastry + Coffee Combo",
+      "rule": "Get any pastry for $1.50 off when purchased together with any coffee item in the same order.",
+      "discount": { "type": "fixed", "value": 1.50, "appliesTo": "pastries" },
+      "eligibility": {
+        "requiredCategories": ["coffee", "pastries"],
+        "minItems": 2,
+        "notes": "Requires at least one coffee item and one pastry item in the same order."
+      },
+      "active": true
+    },
+    {
+      "id": "promo-003",
+      "name": "Summer Smoothie Special",
+      "rule": "Buy one smoothie, get a second smoothie 50% off.",
+      "discount": { "type": "percent", "value": 50, "appliesTo": "cold drinks (smoothies)" },
+      "eligibility": {
+        "minItems": 2,
+        "notes": "Applies to the lower-priced of two smoothies in the same order. Seasonal promotion, currently expired."
+      },
+      "active": false
+    }
+  ]
+}

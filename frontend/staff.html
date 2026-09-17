@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CafeBot Staff Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f2ede7;
+      color: #3b2f2a;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: #6f4e37;
+      color: #fff;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+    }
+
+    #refreshBtn {
+      background: #fff;
+      color: #6f4e37;
+    }
+
+    main {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    #status {
+      text-align: center;
+      color: #7a6a60;
+      padding: 24px 0;
+    }
+
+    .order-card {
+      background: #fffaf5;
+      border: 1px solid #e8ddd2;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 6px;
+      border-bottom: 1px solid #e8ddd2;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+    }
+
+    .order-id {
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .order-time {
+      font-size: 0.8rem;
+      color: #7a6a60;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #7a6a60;
+      margin-top: 10px;
+    }
+
+    ul.items {
+      margin: 4px 0 0;
+      padding-left: 18px;
+      font-size: 0.9rem;
+    }
+
+    .fulfillment,
+    .pricing {
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .total-line {
+      font-weight: bold;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    select {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #d8c6b8;
+      font-size: 0.9rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      background: #ece4da;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CafeBot Staff Dashboard</h1>
+    <button id="refreshBtn">Refresh</button>
+  </header>
+
+  <main>
+    <div id="status">Loading orders...</div>
+    <div id="orders"></div>
+  </main>
+
+  <script>
+    // Point this at wherever the backend (backend/server.js) is running.
+    const API_BASE = "http://localhost:3000";
+
+    const ORDER_STATUSES = ["confirmed", "preparing", "ready", "completed", "cancelled"];
+
+    const statusEl = document.getElementById("status");
+    const ordersEl = document.getElementById("orders");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    function formatFulfillment(fulfillment) {
+      if (!fulfillment || !fulfillment.type) return "Not set";
+
+      if (fulfillment.type === "pickup") {
+        return `Pickup — ${fulfillment.customerName || "(name needed)"}${
+          fulfillment.pickupTime ? `, ${fulfillment.pickupTime}` : ""
+        }`;
+      }
+
+      if (fulfillment.type === "delivery") {
+        const unit = fulfillment.apartmentUnit ? `, ${fulfillment.apartmentUnit}` : "";
+        return `Delivery — ${fulfillment.customerName || "(name needed)"} · ${
+          fulfillment.phone || "(phone needed)"
+        } · ${fulfillment.address || "(address needed)"}${unit}`;
+      }
+
+      return fulfillment.type;
+    }
+
+    function formatItems(items) {
+      if (!items || !items.length) return "<li>(no items)</li>";
+      return items
+        .map((item) => {
+          const size = item.size ? `${item.size} ` : "";
+          const options = item.options && item.options.length ? ` (${item.options.join(", ")})` : "";
+          return `<li>${item.quantity}x ${size}${item.name}${options} — $${item.lineTotal.toFixed(2)}</li>`;
+        })
+        .join("");
+    }
+
+    function formatPricing(pricing, promotions) {
+      if (!pricing) return "";
+      const lines = [`Subtotal: $${pricing.subtotal.toFixed(2)}`];
+      if (promotions && promotions.applied) {
+        lines.push(`${promotions.applied.name}: -$${promotions.applied.discountAmount.toFixed(2)}`);
+      }
+      lines.push(`Tax: $${pricing.tax.toFixed(2)}`);
+      if (pricing.deliveryFee > 0) {
+        lines.push(`Delivery fee: $${pricing.deliveryFee.toFixed(2)}`);
+      }
+      lines.push(`<span class="total-line">Total: $${pricing.total.toFixed(2)}</span>`);
+      return lines.join("<br>");
+    }
+
+    function statusOptionsHtml(current) {
+      return ORDER_STATUSES.map(
+        (status) => `<option value="${status}"${status === current ? " selected" : ""}>${status}</option>`
+      ).join("");
+    }
+
+    function renderOrders(records) {
+      if (!records.length) {
+        ordersEl.innerHTML = "";
+        statusEl.textContent = "No orders yet.";
+        statusEl.hidden = false;
+        return;
+      }
+
+      statusEl.hidden = true;
+
+      ordersEl.innerHTML = records
+        .map((record) => {
+          const { orderId, timestamp, status, order } = record;
+          return `
+            <div class="order-card" data-order-id="${orderId}">
+              <div class="order-header">
+                <span class="order-id">#${orderId.slice(0, 8)}</span>
+                <span class="status-badge">${status}</span>
+                <span class="order-time">${new Date(timestamp).toLocaleString()}</span>
+              </div>
+
+              <div class="section-label">Items</div>
+              <ul class="items">${formatItems(order.items)}</ul>
+
+              <div class="section-label">Fulfillment</div>
+              <div class="fulfillment">${formatFulfillment(order.fulfillment)}</div>
+
+              <div class="section-label">Total</div>
+              <div class="pricing">${formatPricing(order.pricing, order.promotions)}</div>
+
+              <div class="status-row">
+                <label for="status-${orderId}">Status:</label>
+                <select id="status-${orderId}" data-order-id="${orderId}">
+                  ${statusOptionsHtml(status)}
+                </select>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+
+      ordersEl.querySelectorAll("select[data-order-id]").forEach((select) => {
+        select.addEventListener("change", () => updateStatus(select.dataset.orderId, select.value));
+      });
+    }
+
+    async function loadOrders() {
+      statusEl.hidden = false;
+      statusEl.textContent = "Loading orders...";
+
+      try {
+        const res = await fetch(`${API_BASE}/api/staff/orders`);
+        if (!res.ok) throw new Error(`Request failed (${res.status})`);
+        const data = await res.json();
+        renderOrders(data.orders || []);
+      } catch (err) {
+        statusEl.textContent = `Couldn't load orders: ${err.message}`;
+      }
+    }
+
+    async function updateStatus(orderId, status) {
+      try {
+        const res = await fetch(`${API_BASE}/api/staff/orders/${encodeURIComponent(orderId)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || `Request failed (${res.status})`);
+        }
+        await loadOrders();
+      } catch (err) {
+        alert(`Couldn't update status: ${err.message}`);
+        await loadOrders();
+      }
+    }
+
+    refreshBtn.addEventListener("click", loadOrders);
+    loadOrders();
+  </script>
+</body>
+</html>

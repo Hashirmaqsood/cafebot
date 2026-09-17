@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# Saved customer orders (name, phone, address) — runtime data, not
+# source. Recreated automatically on first confirmed order.
+data/orders.json

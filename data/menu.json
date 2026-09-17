@@ -1,0 +1,191 @@
+{
+  "currency": "USD",
+  "items": [
+    {
+      "id": "coffee-001",
+      "name": "Classic Drip Coffee",
+      "category": "coffee",
+      "description": "Freshly brewed medium-roast coffee.",
+      "sizes": [
+        { "name": "Small", "price": 2.50 },
+        { "name": "Medium", "price": 3.00 },
+        { "name": "Large", "price": 3.50 }
+      ],
+      "options": ["Add milk", "Add sugar", "Decaf available"],
+      "allergens": [],
+      "dietary": ["vegan", "gluten-free"]
+    },
+    {
+      "id": "coffee-002",
+      "name": "Cappuccino",
+      "category": "coffee",
+      "description": "Espresso topped with steamed milk and a thick layer of foam.",
+      "sizes": [
+        { "name": "Small", "price": 3.50 },
+        { "name": "Medium", "price": 4.00 },
+        { "name": "Large", "price": 4.50 }
+      ],
+      "options": ["Whole milk", "Oat milk (+$0.50)", "Almond milk (+$0.50)", "Extra shot (+$0.75)"],
+      "allergens": ["milk"],
+      "dietary": ["vegetarian", "gluten-free"]
+    },
+    {
+      "id": "coffee-003",
+      "name": "Caramel Latte",
+      "category": "coffee",
+      "description": "Espresso with steamed milk and caramel syrup, finished with a light foam.",
+      "sizes": [
+        { "name": "Small", "price": 4.00 },
+        { "name": "Medium", "price": 4.50 },
+        { "name": "Large", "price": 5.00 }
+      ],
+      "options": ["Whole milk", "Oat milk (+$0.50)", "Extra caramel drizzle"],
+      "allergens": ["milk"],
+      "dietary": ["vegetarian", "gluten-free"]
+    },
+    {
+      "id": "tea-001",
+      "name": "English Breakfast Tea",
+      "category": "tea",
+      "description": "A classic full-bodied black tea, served hot.",
+      "sizes": [
+        { "name": "Small", "price": 2.25 },
+        { "name": "Large", "price": 2.75 }
+      ],
+      "options": ["Add milk", "Add honey", "Add lemon"],
+      "allergens": [],
+      "dietary": ["vegan", "gluten-free"]
+    },
+    {
+      "id": "tea-002",
+      "name": "Green Tea",
+      "category": "tea",
+      "description": "Light and grassy Japanese-style green tea.",
+      "sizes": [
+        { "name": "Small", "price": 2.25 },
+        { "name": "Large", "price": 2.75 }
+      ],
+      "options": ["Add honey"],
+      "allergens": [],
+      "dietary": ["vegan", "gluten-free"]
+    },
+    {
+      "id": "cold-001",
+      "name": "Iced Coffee",
+      "category": "cold drinks",
+      "description": "Chilled coffee served over ice.",
+      "sizes": [
+        { "name": "Medium", "price": 3.50 },
+        { "name": "Large", "price": 4.00 }
+      ],
+      "options": ["Add milk", "Add flavored syrup (+$0.50)"],
+      "allergens": [],
+      "dietary": ["vegan", "gluten-free"]
+    },
+    {
+      "id": "cold-002",
+      "name": "Mango Smoothie",
+      "category": "cold drinks",
+      "description": "Blended mango, yogurt, and a touch of honey.",
+      "sizes": [
+        { "name": "Medium", "price": 5.00 },
+        { "name": "Large", "price": 5.75 }
+      ],
+      "options": ["Dairy-free yogurt (+$0.50)"],
+      "allergens": ["milk"],
+      "dietary": ["vegetarian", "gluten-free"]
+    },
+    {
+      "id": "cold-003",
+      "name": "Lemonade",
+      "category": "cold drinks",
+      "description": "Freshly squeezed lemonade, lightly sweetened.",
+      "sizes": [
+        { "name": "Medium", "price": 3.00 },
+        { "name": "Large", "price": 3.50 }
+      ],
+      "options": ["Less sugar", "Add mint"],
+      "allergens": [],
+      "dietary": ["vegan", "gluten-free"]
+    },
+    {
+      "id": "pastry-001",
+      "name": "Butter Croissant",
+      "category": "pastries",
+      "description": "Flaky, buttery classic French croissant.",
+      "price": 3.25,
+      "sizes": [],
+      "options": ["Warmed up"],
+      "allergens": ["gluten", "milk", "egg"],
+      "dietary": ["vegetarian"]
+    },
+    {
+      "id": "pastry-002",
+      "name": "Blueberry Muffin",
+      "category": "pastries",
+      "description": "Soft muffin loaded with fresh blueberries.",
+      "price": 3.00,
+      "sizes": [],
+      "options": [],
+      "allergens": ["gluten", "milk", "egg"],
+      "dietary": ["vegetarian"]
+    },
+    {
+      "id": "pastry-003",
+      "name": "Almond Biscotti",
+      "category": "pastries",
+      "description": "Crunchy twice-baked Italian cookie with roasted almonds.",
+      "price": 2.50,
+      "sizes": [],
+      "options": [],
+      "allergens": ["gluten", "egg", "nuts"],
+      "dietary": ["vegetarian"]
+    },
+    {
+      "id": "sandwich-001",
+      "name": "Turkey & Swiss Sandwich",
+      "category": "sandwiches",
+      "description": "Sliced turkey breast and Swiss cheese with lettuce and mustard on whole wheat bread.",
+      "price": 6.50,
+      "sizes": [],
+      "options": ["No mustard", "Add tomato", "Toasted"],
+      "allergens": ["gluten", "milk"],
+      "dietary": []
+    },
+    {
+      "id": "sandwich-002",
+      "name": "Grilled Veggie Panini",
+      "category": "sandwiches",
+      "description": "Grilled zucchini, peppers, and mozzarella with pesto on ciabatta.",
+      "price": 6.00,
+      "sizes": [],
+      "options": ["No cheese (vegan)", "Extra pesto"],
+      "allergens": ["gluten", "milk"],
+      "dietary": ["vegetarian"]
+    },
+    {
+      "id": "dessert-001",
+      "name": "Chocolate Brownie",
+      "category": "desserts",
+      "description": "Rich, fudgy chocolate brownie.",
+      "price": 3.50,
+      "sizes": [],
+      "options": ["Warmed up", "Add ice cream (+$1.00)"],
+      "allergens": ["gluten", "milk", "egg"],
+      "dietary": ["vegetarian"]
+    },
+    {
+      "id": "dessert-002",
+      "name": "Fresh Fruit Cup",
+      "category": "desserts",
+      "description": "A mix of seasonal fresh fruit.",
+      "sizes": [
+        { "name": "Small", "price": 3.00 },
+        { "name": "Large", "price": 4.50 }
+      ],
+      "options": [],
+      "allergens": [],
+      "dietary": ["vegan", "gluten-free"]
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CafeBot</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="chat-app">
+    <header class="chat-header">
+      <div class="avatar" aria-hidden="true">☕</div>
+      <div class="header-text">
+        <h1>CafeBot</h1>
+        <p class="status">Online</p>
+      </div>
+    </header>
+
+    <main class="chat-area" id="chatArea" aria-live="polite">
+      <!-- Mock messages -->
+      <div class="message bot">
+        <div class="bubble">Hi there! 👋 Welcome to CafeBot. Would you like to see our menu or place an order?</div>
+      </div>
+
+      <div class="message customer">
+        <div class="bubble">Hi! What coffees do you have?</div>
+      </div>
+
+      <div class="message bot">
+        <div class="bubble">We have Classic Drip Coffee, Cappuccino, and Caramel Latte ☕ — all available in Small, Medium, or Large. Want to hear the prices?</div>
+      </div>
+
+      <div class="message customer">
+        <div class="bubble">Yes please, and I'll take a medium caramel latte.</div>
+      </div>
+
+      <div class="message bot">
+        <div class="bubble">Great choice! A Medium Caramel Latte is $4.50. Here's your order so far:<br>• 1 x Medium Caramel Latte — $4.50<br><br>Anything else, or shall I confirm this order?</div>
+      </div>
+
+      <div class="message customer">
+        <div class="bubble">That's all, thanks!</div>
+      </div>
+
+      <div class="message bot">
+        <div class="bubble">Here's your order confirmation:<br>• 1 x Medium Caramel Latte — $4.50<br>Total: $4.50<br><br>Does this look right?</div>
+      </div>
+    </main>
+
+    <form class="chat-input-area" id="chatForm">
+      <input
+        type="text"
+        id="chatInput"
+        class="chat-input"
+        placeholder="Type a message..."
+        aria-label="Type a message"
+        autocomplete="off"
+      />
+      <button type="submit" class="send-button" aria-label="Send message">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+          <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
