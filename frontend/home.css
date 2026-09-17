@@ -1,0 +1,359 @@
+* {
+  box-sizing: border-box;
+}
+
+body.home-body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #f2ede7;
+  color: #3b2f2a;
+}
+
+/* Header */
+.site-header {
+  background: #6f4e37;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.site-header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.site-nav a {
+  color: #f2ede7;
+  text-decoration: none;
+  margin-left: 18px;
+  font-size: 0.92rem;
+}
+
+.site-nav a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Hero */
+.hero {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 60px 20px 40px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.hero p {
+  color: #6b5c50;
+  margin-bottom: 24px;
+}
+
+.hero-cta {
+  background: #6f4e37;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.hero-cta:hover {
+  background: #5a3e2b;
+}
+
+/* Menu & hours sections */
+.menu-section,
+.hours-section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.menu-section h2,
+.hours-section h2 {
+  border-bottom: 2px solid #d8c6b8;
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.menu-card {
+  background: #fffaf5;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.menu-card .category {
+  font-size: 0.75rem;
+  color: #a0876f;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.menu-card h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.menu-card p {
+  margin: 6px 0;
+  font-size: 0.88rem;
+  color: #6b5c50;
+}
+
+.menu-card .prices {
+  font-weight: 600;
+  color: #3b2f2a;
+  font-size: 0.9rem;
+}
+
+/* Hours */
+.hours-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px 24px;
+  background: #fffaf5;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.hours-grid .day {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.92rem;
+  padding: 4px 0;
+}
+
+.hours-grid .day span:first-child {
+  font-weight: 600;
+}
+
+.location-block {
+  margin-top: 16px;
+  font-size: 0.92rem;
+  color: #4b3d34;
+}
+
+/* Footer */
+.site-footer {
+  text-align: center;
+  padding: 24px 20px 40px;
+  color: #8a7a6c;
+  font-size: 0.85rem;
+}
+
+/* Floating chat button */
+.chat-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #6f4e37;
+  color: #fff;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+}
+
+.chat-fab:hover {
+  background: #5a3e2b;
+}
+
+/* Chat widget panel — self-contained styles so this page doesn't need
+   styles.css (which assumes a full-page standalone chat layout). */
+.chat-widget {
+  position: fixed;
+  bottom: 92px;
+  right: 24px;
+  width: 340px;
+  height: 480px;
+  z-index: 20;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.chat-widget .chat-app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fffaf5;
+}
+
+.chat-widget .chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #6f4e37;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.chat-widget .avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.chat-widget .header-text h1 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.chat-widget .status {
+  margin: 0;
+  font-size: 0.7rem;
+  color: #d8c6b8;
+}
+
+.chat-widget .status::before {
+  content: "● ";
+  color: #7ed957;
+}
+
+.chat-widget .chat-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.chat-widget .chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-widget .message {
+  display: flex;
+  max-width: 100%;
+}
+
+.chat-widget .message.customer {
+  justify-content: flex-end;
+}
+
+.chat-widget .message.bot {
+  justify-content: flex-start;
+}
+
+.chat-widget .bubble {
+  max-width: 82%;
+  padding: 8px 12px;
+  border-radius: 14px;
+  line-height: 1.35;
+  font-size: 0.85rem;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.chat-widget .message.bot .bubble {
+  background: #ece4da;
+  color: #3b2f2a;
+  border-bottom-left-radius: 4px;
+}
+
+.chat-widget .message.customer .bubble {
+  background: #6f4e37;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-widget .chat-input-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid #e8ddd2;
+  background: #fffaf5;
+  flex-shrink: 0;
+}
+
+.chat-widget .chat-input {
+  flex: 1;
+  border: 1px solid #d8c6b8;
+  border-radius: 18px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  outline: none;
+  background: #fff;
+}
+
+.chat-widget .chat-input:focus {
+  border-color: #6f4e37;
+  box-shadow: 0 0 0 2px rgba(111, 78, 55, 0.25);
+}
+
+.chat-widget .send-button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #6f4e37;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.chat-widget .send-button:hover {
+  background: #5a3e2b;
+}
+
+@media (max-width: 480px) {
+  .chat-widget {
+    width: calc(100% - 24px);
+    right: 12px;
+    height: 70vh;
+    bottom: 84px;
+  }
+
+  .chat-fab {
+    right: 16px;
+    bottom: 16px;
+  }
+}

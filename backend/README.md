@@ -91,7 +91,24 @@ const DELIVERY_FEE = 3.0; // flat fee, delivery orders only
 
 Those same endpoints also return `promotionMessage`: a short note about the currently applied promotion (or `null` if none applies). See "Promotions" below.
 
-`/api/chat`'s `reply` comes from Anthropic's Messages API (`AI_MODEL`, called via the built-in `fetch` — no SDK dependency). CafeBot's system instructions (`prompts/system-prompt.md`) are grounded with the live `data/menu.json`, currently active promotions, and the session's current `orderSummary` before every call, so replies are never invented — see `buildGroundedSystemPrompt()`. If `ANTHROPIC_API_KEY` isn't set, or the API call fails, `reply` falls back to a plain apology message rather than fabricating an answer.
+`/api/chat`'s `reply` comes from Anthropic's Messages API (`AI_MODEL`, called via the built-in `fetch` — no SDK dependency). CafeBot's system instructions (`prompts/system-prompt.md`) are grounded with the live `data/menu.json`, currently active promotions, `data/faq.json` (hours/location/wifi), and the session's current `orderSummary` before every call, so replies are never invented — see `buildGroundedSystemPrompt()`. If `ANTHROPIC_API_KEY` isn't set, or the API call fails, `reply` falls back to a plain apology message rather than fabricating an answer.
+
+### `GET /api/menu`
+
+Returns every menu item and the currently active promotions — read-only, no session needed. Used by `frontend/home.html` to render the menu grid.
+
+**Response body:**
+
+```json
+{
+  "items": [{ "...": "same shape as data/menu.json's items" }],
+  "activePromotions": [{ "id": "promo-001", "name": "Happy Hour Coffee", "rule": "20% off any coffee category item purchased between 2pm and 4pm." }]
+}
+```
+
+### `GET /api/faq`
+
+Returns `data/faq.json` as-is (hours, location, wifi) — read-only, no session needed. Used by `frontend/home.html`'s Hours & Location section, and included in CafeBot's grounded system prompt so it can answer these questions too.
 
 ### `POST /api/order/items`
 

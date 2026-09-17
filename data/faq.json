@@ -1,0 +1,18 @@
+{
+  "hours": {
+    "monday": "7:00 AM - 6:00 PM",
+    "tuesday": "7:00 AM - 6:00 PM",
+    "wednesday": "7:00 AM - 6:00 PM",
+    "thursday": "7:00 AM - 6:00 PM",
+    "friday": "7:00 AM - 8:00 PM",
+    "saturday": "8:00 AM - 8:00 PM",
+    "sunday": "8:00 AM - 4:00 PM"
+  },
+  "location": {
+    "address": "123 Main Street, Springfield",
+    "phone": "(555) 234-5678",
+    "parking": "Free street parking available after 6pm and on weekends."
+  },
+  "wifi": "Free Wi-Fi for customers — ask staff for the password.",
+  "notes": "Demo data for the CafeBot project — replace with your real cafe's info."
+}

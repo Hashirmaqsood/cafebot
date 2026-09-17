@@ -44,6 +44,7 @@ const { getRecommendations, formatRecommendationMessage } = require("./recommend
 const { getEligiblePromotions, formatPromotionMessage } = require("./promotionEngine");
 const { getAllMenuItems } = require("./menu");
 const { getActivePromotions } = require("./promotions");
+const { getFaqData } = require("./faq");
 const { buildOrderSummary } = require("./orderSummary");
 const { confirmOrder } = require("./confirmation");
 const { getAllOrders, updateOrderStatus } = require("./orderStorage");
@@ -129,6 +130,7 @@ function buildGroundedSystemPrompt(order) {
     name: promotion.name,
     rule: promotion.rule,
   }));
+  const faqData = getFaqData();
 
   return `${systemPrompt}
 
@@ -138,6 +140,9 @@ ${JSON.stringify(menuItems)}
 
 ## Active promotions (source of truth — data/promotions.json)
 ${JSON.stringify(activePromotions)}
+
+## Cafe FAQ data (source of truth — data/faq.json): hours, location, wifi
+${JSON.stringify(faqData)}
 
 ## Customer's current order (already priced — never recalculate)
 ${summarizeOrder(order)}`;
@@ -641,6 +646,21 @@ async function handleConfirmOrder(req, res) {
   });
 }
 
+async function handleGetMenu(req, res) {
+  sendJson(res, 200, {
+    items: getAllMenuItems(),
+    activePromotions: getActivePromotions().map((promotion) => ({
+      id: promotion.id,
+      name: promotion.name,
+      rule: promotion.rule,
+    })),
+  });
+}
+
+async function handleGetFaq(req, res) {
+  sendJson(res, 200, getFaqData());
+}
+
 async function handleGetStaffOrders(req, res) {
   sendJson(res, 200, { orders: getAllOrders() });
 }
@@ -717,6 +737,12 @@ const server = http.createServer((req, res) => {
   }
   if (req.method === "POST" && pathname === "/api/order/confirm") {
     return handleConfirmOrder(req, res);
+  }
+  if (req.method === "GET" && pathname === "/api/menu") {
+    return handleGetMenu(req, res);
+  }
+  if (req.method === "GET" && pathname === "/api/faq") {
+    return handleGetFaq(req, res);
   }
   if (req.method === "GET" && pathname === "/api/staff/orders") {
     return handleGetStaffOrders(req, res);

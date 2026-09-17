@@ -1,15 +1,16 @@
-// CafeBot frontend — UI only. No AI API, database, or auth is connected here.
-// Sending a message just displays it and echoes a mock bot reply for demo purposes.
+// CafeBot frontend — talks to the real backend's /api/chat endpoint.
+// If the backend isn't reachable, sending a message shows an error
+// bubble rather than a fake reply.
+
+// Update this if the backend is deployed somewhere other than localhost.
+const API_BASE = "http://localhost:3000";
 
 const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
 const chatArea = document.getElementById("chatArea");
 
-const MOCK_REPLIES = [
-  "Thanks for your message! (This is a demo — no AI is connected yet.)",
-  "Got it! Once the backend is built, I'll be able to give a real answer here.",
-  "Noted! This chat is currently running on mock data only.",
-];
+let sessionId = null;
+const history = [];
 
 function addMessage(text, sender) {
   const messageEl = document.createElement("div");
@@ -24,7 +25,7 @@ function addMessage(text, sender) {
   chatArea.scrollTop = chatArea.scrollHeight;
 }
 
-chatForm.addEventListener("submit", (event) => {
+chatForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const text = chatInput.value.trim();
@@ -34,8 +35,29 @@ chatForm.addEventListener("submit", (event) => {
   chatInput.value = "";
   chatInput.focus();
 
-  const reply = MOCK_REPLIES[Math.floor(Math.random() * MOCK_REPLIES.length)];
-  setTimeout(() => addMessage(reply, "bot"), 400);
+  try {
+    const payload = { message: text, history };
+    if (sessionId) payload.sessionId = sessionId;
+
+    const res = await fetch(`${API_BASE}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      addMessage(data.error || "Something went wrong. Please try again.", "bot");
+      return;
+    }
+
+    sessionId = data.sessionId;
+    history.push({ role: "user", content: text });
+    history.push({ role: "assistant", content: data.reply });
+    addMessage(data.reply, "bot");
+  } catch (err) {
+    addMessage("Sorry, I can't reach the CafeBot server right now. Please try again in a moment.", "bot");
+  }
 });
 
 // Some environments don't trigger native form submission on Enter reliably,
