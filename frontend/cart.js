@@ -32,12 +32,27 @@ function updateBadge() {
 async function apiCall(path, method, extraBody) {
   const payload = { ...extraBody };
   if (sessionId) payload.sessionId = sessionId;
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  const data = await res.json();
+
+  let res;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  } catch (err) {
+    return { ok: false, data: { error: "Couldn't reach the server. Please try again in a moment." } };
+  }
+
+  let data;
+  try {
+    data = await res.json();
+  } catch (err) {
+    // Not JSON — e.g. this deployment doesn't implement this endpoint
+    // at all (the Vercel serverless build has no /api/order/*).
+    return { ok: false, data: { error: "Ordering isn't available on this deployment yet." } };
+  }
+
   if (data.sessionId) sessionId = data.sessionId;
   if (data.order) currentOrder = data.order;
   updateBadge();
@@ -73,8 +88,9 @@ function renderCartStep() {
   const order = currentOrder;
   const container = el(`<div></div>`);
 
+  if (cartError) container.appendChild(el(`<p class="cart-error">${cartError}</p>`));
+
   if (!order.items.length) {
-    if (cartError) container.appendChild(el(`<p class="cart-error">${cartError}</p>`));
     container.appendChild(el(`<p class="cart-empty">Your cart is empty. Add something tasty from the menu!</p>`));
     cartBody.replaceChildren(container);
     return;
@@ -237,17 +253,19 @@ function render() {
   return renderCartStep();
 }
 
-function goTo(step) {
+function goTo(step, error = "") {
   cartStep = step;
-  cartError = "";
+  cartError = error;
   render();
 }
 
 function openCart() {
   cartBackdrop.hidden = false;
   cartModal.hidden = false;
-  cartStep = currentOrder.confirmed ? "cart" : nextStep() === "cart" ? "cart" : cartStep === "cart" ? "cart" : cartStep;
-  goTo(currentOrder.items.length ? cartStep : "cart");
+  // If this order was already confirmed this session, show the success
+  // screen again rather than "review" (which would let a re-click of
+  // "Confirm Order" save a second, duplicate record for nothing new).
+  goTo(currentOrder.confirmed && lastSavedOrderId ? "success" : nextStep());
 }
 
 function closeCart() {
@@ -262,14 +280,9 @@ cartBackdrop.addEventListener("click", closeCart);
 // Called from home.js when a customer clicks "Add to Cart" on a menu item.
 async function addToCart(itemId, size) {
   const { ok, data } = await apiCall("/api/order/items", "POST", size ? { itemId, size } : { itemId });
-  if (!ok) {
-    cartError = data.error;
-    goTo("cart");
+  if (!ok || data.needsInput) {
     openCart();
-  } else if (data.needsInput) {
-    cartError = data.message;
-    openCart();
-    renderCartStep();
+    goTo("cart", data.error || data.message);
   } else if (!cartModal.hidden) {
     goTo("cart");
   }
@@ -318,8 +331,7 @@ cartBody.addEventListener("click", async (event) => {
       lastSavedOrderId = data.saved.orderId;
       goTo("success");
     } else {
-      cartError = data.message || data.error || "Something went wrong confirming your order.";
-      goTo("review");
+      goTo("review", data.message || data.error || "Something went wrong confirming your order.");
     }
   } else if (action === "close-cart") {
     closeCart();
@@ -337,8 +349,7 @@ cartBody.addEventListener("submit", async (event) => {
       pickupTime: fields.pickupTime || undefined,
     });
     if (!ok) {
-      cartError = data.error;
-      goTo("pickupForm");
+      goTo("pickupForm", data.error);
     } else {
       goTo(nextStep());
     }
@@ -351,8 +362,7 @@ cartBody.addEventListener("submit", async (event) => {
       deliveryInstructions: fields.deliveryInstructions || undefined,
     });
     if (!ok) {
-      cartError = data.error;
-      goTo("deliveryForm");
+      goTo("deliveryForm", data.error);
     } else {
       goTo(nextStep());
     }
