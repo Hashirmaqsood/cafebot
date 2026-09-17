@@ -56,7 +56,36 @@ function renderMenuItems(items) {
     prices.className = "prices";
     prices.textContent = formatPrice(item);
 
-    card.append(category, name, description, prices);
+    const cartRow = document.createElement("div");
+    cartRow.className = "menu-card-cart-row";
+
+    let sizeSelect = null;
+    if (item.sizes && item.sizes.length) {
+      sizeSelect = document.createElement("select");
+      sizeSelect.className = "size-select";
+      item.sizes.forEach((size) => {
+        const option = document.createElement("option");
+        option.value = size.name;
+        option.textContent = size.name;
+        sizeSelect.appendChild(option);
+      });
+      cartRow.appendChild(sizeSelect);
+    }
+
+    const addButton = document.createElement("button");
+    addButton.type = "button";
+    addButton.className = "add-to-cart-btn";
+    addButton.textContent = "Add to Cart";
+    addButton.addEventListener("click", () => {
+      addToCart(item.id, sizeSelect ? sizeSelect.value : undefined);
+      addButton.textContent = "Added ✓";
+      setTimeout(() => {
+        addButton.textContent = "Add to Cart";
+      }, 1200);
+    });
+    cartRow.appendChild(addButton);
+
+    card.append(category, name, description, prices, cartRow);
     menuGrid.appendChild(card);
   });
 }

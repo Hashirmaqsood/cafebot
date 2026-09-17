@@ -16,7 +16,11 @@ const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
 const chatArea = document.getElementById("chatArea");
 
-let sessionId = null;
+// Generated immediately (not left null) because the order endpoints
+// used by cart.js require a sessionId upfront — only /api/chat can
+// auto-generate one on its own. Chat and cart share this same id, so
+// they operate on the same order.
+let sessionId = crypto.randomUUID();
 const history = [];
 
 function addMessage(text, sender) {
