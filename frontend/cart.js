@@ -50,7 +50,10 @@ async function apiCall(path, method, extraBody) {
   } catch (err) {
     // Not JSON — e.g. this deployment doesn't implement this endpoint
     // at all (the Vercel serverless build has no /api/order/*).
-    return { ok: false, data: { error: "Ordering isn't available on this deployment yet." } };
+    return {
+      ok: false,
+      data: { error: "🛠️ Online ordering isn't set up on this preview yet — tap 💬 Chat now and CafeBot can help with your order in the meantime!" },
+    };
   }
 
   if (data.sessionId) sessionId = data.sessionId;

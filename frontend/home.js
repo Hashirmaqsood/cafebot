@@ -12,6 +12,22 @@ const chatFab = document.getElementById("chatFab");
 const closeChatBtn = document.getElementById("closeChatBtn");
 const openChatBtn = document.getElementById("openChatBtn");
 const navChatBtn = document.getElementById("navChatBtn");
+const navToggle = document.getElementById("navToggle");
+const siteNav = document.getElementById("siteNav");
+const topBarStatus = document.getElementById("topBarStatus");
+const topBarContact = document.getElementById("topBarContact");
+
+navToggle.addEventListener("click", () => {
+  const isOpen = siteNav.classList.toggle("open");
+  navToggle.setAttribute("aria-expanded", String(isOpen));
+});
+
+siteNav.querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    siteNav.classList.remove("open");
+    navToggle.setAttribute("aria-expanded", "false");
+  });
+});
 
 function openChat() {
   chatWidget.hidden = false;
@@ -124,11 +140,39 @@ async function loadMenu() {
 
 const DAY_NAMES = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
+// "7:00 AM" -> minutes since midnight
+function parseTimeToMinutes(str) {
+  const [time, meridiem] = str.trim().split(" ");
+  let [hours, minutes] = time.split(":").map(Number);
+  if (meridiem.toUpperCase() === "PM" && hours !== 12) hours += 12;
+  if (meridiem.toUpperCase() === "AM" && hours === 12) hours = 0;
+  return hours * 60 + minutes;
+}
+
+function renderTopBarStatus(todayHoursStr) {
+  if (!todayHoursStr) {
+    topBarStatus.textContent = "";
+    return;
+  }
+  const [openStr, closeStr] = todayHoursStr.split("-").map((s) => s.trim());
+  const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+  const isOpen = nowMinutes >= parseTimeToMinutes(openStr) && nowMinutes < parseTimeToMinutes(closeStr);
+
+  topBarStatus.innerHTML = isOpen
+    ? `<span class="status-dot status-dot--open"></span> Open now · Closes ${closeStr}`
+    : `<span class="status-dot status-dot--closed"></span> Closed now · Opens ${openStr}`;
+}
+
 async function loadFaq() {
   try {
     const res = await fetch(`${API_BASE}/api/faq`);
     const data = await res.json();
     const today = DAY_NAMES[new Date().getDay()];
+
+    renderTopBarStatus(data.hours && data.hours[today]);
+    if (data.location) {
+      topBarContact.textContent = `📞 ${data.location.phone}  ·  📍 ${data.location.address}`;
+    }
 
     const hoursGrid = document.createElement("div");
     hoursGrid.className = "hours-grid";
@@ -167,6 +211,7 @@ async function loadFaq() {
     hoursContent.append(hoursGrid, locationBlock);
   } catch (err) {
     hoursContent.textContent = "Couldn't load hours right now — please try again shortly.";
+    topBarStatus.textContent = "☕ CafeBot Cafe";
   }
 }
 

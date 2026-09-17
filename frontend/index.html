@@ -67,13 +67,23 @@
   </script>
 </head>
 <body class="home-body">
+  <div class="top-bar" id="topBar">
+    <div class="top-bar-inner">
+      <span class="top-bar-status" id="topBarStatus">Loading today's hours…</span>
+      <span class="top-bar-contact" id="topBarContact"></span>
+    </div>
+  </div>
+
   <header class="site-header" id="siteHeader">
     <div class="site-header-inner">
-      <div class="brand">
+      <a class="brand" href="#">
         <span class="brand-mark">☕</span>
-        <span>CafeBot Cafe</span>
-      </div>
-      <nav class="site-nav">
+        <span class="brand-text">
+          CafeBot Cafe
+          <small>Coffee &amp; Kitchen</small>
+        </span>
+      </a>
+      <nav class="site-nav" id="siteNav">
         <a href="#menu">Menu</a>
         <a href="#hours">Hours &amp; Location</a>
       </nav>
@@ -83,7 +93,10 @@
           <span class="cart-badge" id="cartBadge" hidden>0</span>
         </button>
         <button class="hero-cta hero-cta--nav" id="navChatBtn" type="button">
-          <span class="cta-icon">💬</span> Chat now
+          <span class="cta-icon">💬</span><span class="cta-label">Chat now</span>
+        </button>
+        <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle menu" aria-expanded="false">
+          <span></span><span></span><span></span>
         </button>
       </div>
     </div>
