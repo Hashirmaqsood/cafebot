@@ -3,7 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CafeBot Cafe</title>
+  <title>CafeBot Cafe — Great Coffee, Warm Welcome</title>
+  <meta
+    name="description"
+    content="CafeBot Cafe: freshly roasted coffee, house-made pastries, and effortless ordering. Browse the menu, check hours, and order in seconds."
+  />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#3b2f2a" />
+  <link rel="canonical" href="https://cafebot-6opq.vercel.app/" />
+
+  <!-- Open Graph / social preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="CafeBot Cafe" />
+  <meta property="og:title" content="CafeBot Cafe — Great Coffee, Warm Welcome" />
+  <meta
+    property="og:description"
+    content="Freshly roasted coffee, house-made pastries, and effortless ordering. Browse the menu, check hours, and order in seconds."
+  />
+  <meta property="og:url" content="https://cafebot-6opq.vercel.app/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="CafeBot Cafe — Great Coffee, Warm Welcome" />
+  <meta
+    name="twitter:description"
+    content="Freshly roasted coffee, house-made pastries, and effortless ordering."
+  />
+
+  <!-- Favicon (inline SVG, no separate asset needed) -->
+  <link
+    rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233b2f2a'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle'%3E%E2%98%95%3C/text%3E%3C/svg%3E"
+  />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -11,6 +41,30 @@
     rel="stylesheet"
   />
   <link rel="stylesheet" href="home.css" />
+
+  <!-- Structured data for search engines -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CafeOrCoffeeShop",
+      "name": "CafeBot Cafe",
+      "description": "Freshly roasted coffee, house-made pastries, and effortless ordering.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "123 Main Street",
+        "addressLocality": "Springfield"
+      },
+      "telephone": "(555) 234-5678",
+      "servesCuisine": "Coffee, Cafe",
+      "priceRange": "$",
+      "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday"], "opens": "07:00", "closes": "18:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Friday", "opens": "07:00", "closes": "20:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "20:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "08:00", "closes": "16:00" }
+      ]
+    }
+  </script>
 </head>
 <body class="home-body">
   <header class="site-header" id="siteHeader">
@@ -22,7 +76,6 @@
       <nav class="site-nav">
         <a href="#menu">Menu</a>
         <a href="#hours">Hours &amp; Location</a>
-        <a href="demo.html">Full-page chat</a>
       </nav>
       <div class="header-actions">
         <button class="cart-btn" id="cartBtn" type="button" aria-label="Open your order">
@@ -38,10 +91,12 @@
 
   <section class="hero">
     <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-glow hero-glow--one" aria-hidden="true"></div>
+    <div class="hero-glow hero-glow--two" aria-hidden="true"></div>
     <div class="hero-inner">
       <span class="hero-badge">☀️ Open today</span>
       <h1>Great coffee, <span class="hero-highlight">warm welcome.</span></h1>
-      <p>Freshly brewed coffee, house-made pastries, and a friendly AI barista ready to help you order — day or night.</p>
+      <p>Freshly roasted coffee, house-made pastries, and effortless ordering — browse, customize, and check out in moments.</p>
       <div class="hero-actions">
         <button class="hero-cta" id="openChatBtn" type="button">
           <span class="cta-icon">💬</span> Chat with CafeBot
@@ -55,18 +110,18 @@
     <div class="features-inner">
       <div class="feature-card">
         <div class="feature-icon">🌱</div>
-        <h3>Fresh, daily</h3>
+        <h3>Fresh, Daily</h3>
         <p>Beans roasted weekly, pastries baked fresh each morning.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🤖</div>
-        <h3>AI-powered ordering</h3>
-        <p>Ask CafeBot anything — menu, allergens, hours, or deals.</p>
+        <div class="feature-icon">⚡</div>
+        <h3>Order in Seconds</h3>
+        <p>Browse, customize, and check out — no waiting in line.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">📶</div>
-        <h3>Free Wi-Fi</h3>
-        <p>Cozy seating and fast Wi-Fi — stay a while.</p>
+        <div class="feature-icon">🌎</div>
+        <h3>Sustainably Sourced</h3>
+        <p>Single-origin beans from farms we know and trust.</p>
       </div>
     </div>
   </section>
