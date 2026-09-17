@@ -4,38 +4,92 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CafeBot Cafe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="home.css" />
 </head>
 <body class="home-body">
-  <header class="site-header">
+  <header class="site-header" id="siteHeader">
     <div class="site-header-inner">
-      <div class="brand">☕ CafeBot Cafe</div>
+      <div class="brand">
+        <span class="brand-mark">☕</span>
+        <span>CafeBot Cafe</span>
+      </div>
       <nav class="site-nav">
         <a href="#menu">Menu</a>
         <a href="#hours">Hours &amp; Location</a>
         <a href="demo.html">Full-page chat</a>
       </nav>
+      <button class="hero-cta hero-cta--nav" id="navChatBtn" type="button">
+        <span class="cta-icon">💬</span> Chat now
+      </button>
     </div>
   </header>
 
   <section class="hero">
-    <h1>Great coffee, warm welcome.</h1>
-    <p>Browse our menu below, or chat with CafeBot in the corner to ask questions and place an order.</p>
-    <button class="hero-cta" id="openChatBtn" type="button">Chat with CafeBot</button>
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <span class="hero-badge">☀️ Open today</span>
+      <h1>Great coffee, <span class="hero-highlight">warm welcome.</span></h1>
+      <p>Freshly brewed coffee, house-made pastries, and a friendly AI barista ready to help you order — day or night.</p>
+      <div class="hero-actions">
+        <button class="hero-cta" id="openChatBtn" type="button">
+          <span class="cta-icon">💬</span> Chat with CafeBot
+        </button>
+        <a class="hero-secondary" href="#menu">Browse the menu ↓</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="features-inner">
+      <div class="feature-card">
+        <div class="feature-icon">🌱</div>
+        <h3>Fresh, daily</h3>
+        <p>Beans roasted weekly, pastries baked fresh each morning.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>AI-powered ordering</h3>
+        <p>Ask CafeBot anything — menu, allergens, hours, or deals.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📶</div>
+        <h3>Free Wi-Fi</h3>
+        <p>Cozy seating and fast Wi-Fi — stay a while.</p>
+      </div>
+    </div>
   </section>
 
   <section class="menu-section" id="menu">
-    <h2>Our Menu</h2>
+    <div class="section-heading">
+      <span class="section-eyebrow">What we're serving</span>
+      <h2>Our Menu</h2>
+    </div>
+    <div class="menu-filters" id="menuFilters" aria-label="Filter menu by category"></div>
     <div class="menu-grid" id="menuGrid">Loading menu…</div>
   </section>
 
   <section class="hours-section" id="hours">
-    <h2>Hours &amp; Location</h2>
-    <div id="hoursContent">Loading…</div>
+    <div class="section-heading">
+      <span class="section-eyebrow">Plan your visit</span>
+      <h2>Hours &amp; Location</h2>
+    </div>
+    <div class="hours-layout" id="hoursContent">Loading…</div>
   </section>
 
   <footer class="site-footer">
-    <p>CafeBot demo project — not a real cafe.</p>
+    <div class="footer-inner">
+      <div class="brand footer-brand">
+        <span class="brand-mark">☕</span>
+        <span>CafeBot Cafe</span>
+      </div>
+      <p>CafeBot demo project — not a real cafe.</p>
+    </div>
   </footer>
 
   <!-- Floating chat widget -->
@@ -60,7 +114,9 @@
       </form>
     </div>
   </div>
-  <button class="chat-fab" id="chatFab" type="button" aria-label="Open chat">💬</button>
+  <button class="chat-fab" id="chatFab" type="button" aria-label="Open chat">
+    <span class="chat-fab-icon">💬</span>
+  </button>
 
   <script src="script.js"></script>
   <script src="home.js"></script>
