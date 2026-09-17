@@ -48,6 +48,7 @@ const { getFaqData } = require("./faq");
 const { buildOrderSummary } = require("./orderSummary");
 const { confirmOrder } = require("./confirmation");
 const { getAllOrders, updateOrderStatus } = require("./orderStorage");
+const { buildGroundedSystemPrompt, generateReply } = require("./aiReply");
 
 // No dotenv dependency (kept dependency-free on purpose) — read .env
 // ourselves. Values already set in the real environment (e.g. by a
@@ -79,10 +80,6 @@ function loadEnvFile(filePath) {
 loadEnvFile(path.join(__dirname, "..", ".env"));
 
 const PORT = process.env.PORT || 3000;
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || "";
-const AI_MODEL = process.env.AI_MODEL || "claude-haiku-4-5-20251001";
-const AI_API_BASE_URL = process.env.AI_API_BASE_URL || "https://api.anthropic.com";
-const AI_MAX_TOKENS = Number(process.env.AI_MAX_TOKENS) || 512;
 const SYSTEM_PROMPT_PATH = path.join(__dirname, "..", "prompts", "system-prompt.md");
 
 let systemPrompt;
@@ -119,87 +116,6 @@ function readJsonBody(req) {
   });
 }
 
-// Appends the current menu, active promotions, and order summary to
-// CafeBot's system instructions, so the model only ever answers from
-// real data instead of guessing (per prompts/system-prompt.md's "menu
-// & data usage" and "promotions" rules).
-function buildGroundedSystemPrompt(order) {
-  const menuItems = getAllMenuItems();
-  const activePromotions = getActivePromotions().map((promotion) => ({
-    id: promotion.id,
-    name: promotion.name,
-    rule: promotion.rule,
-  }));
-  const faqData = getFaqData();
-
-  return `${systemPrompt}
-
----
-## Menu data (source of truth — data/menu.json)
-${JSON.stringify(menuItems)}
-
-## Active promotions (source of truth — data/promotions.json)
-${JSON.stringify(activePromotions)}
-
-## Cafe FAQ data (source of truth — data/faq.json): hours, location, wifi
-${JSON.stringify(faqData)}
-
-## Customer's current order (already priced — never recalculate)
-${summarizeOrder(order)}`;
-}
-
-// Calls Anthropic's Messages API for CafeBot's reply. Falls back to a
-// plain apology message (never a fabricated answer) if the key is
-// missing or the request fails for any reason.
-async function generateReply(systemPromptText, history, message) {
-  if (!ANTHROPIC_API_KEY) {
-    return "CafeBot's AI isn't configured yet — an administrator needs to set ANTHROPIC_API_KEY in the backend's .env file.";
-  }
-
-  const messages = (history || [])
-    .filter(
-      (entry) =>
-        entry &&
-        (entry.role === "user" || entry.role === "assistant") &&
-        typeof entry.content === "string"
-    )
-    .map((entry) => ({ role: entry.role, content: entry.content }));
-  messages.push({ role: "user", content: message });
-
-  try {
-    const response = await fetch(`${AI_API_BASE_URL}/v1/messages`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: AI_MODEL,
-        max_tokens: AI_MAX_TOKENS,
-        system: systemPromptText,
-        messages,
-      }),
-      signal: AbortSignal.timeout(15000),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error(
-        `Anthropic API error (${response.status}): ${data.error ? data.error.message : "unknown error"}`
-      );
-      return "Sorry, I'm having trouble reaching my AI service right now. Please try again in a moment, or ask a staff member for help.";
-    }
-
-    const textBlock = (data.content || []).find((block) => block.type === "text");
-    return textBlock ? textBlock.text : "Sorry, I couldn't come up with a reply just now — could you try rephrasing?";
-  } catch (err) {
-    console.error(`Failed to reach Anthropic API: ${err.message}`);
-    return "Sorry, I'm having trouble reaching my AI service right now. Please try again in a moment, or ask a staff member for help.";
-  }
-}
-
 async function handleChat(req, res) {
   let parsed;
   try {
@@ -227,7 +143,7 @@ async function handleChat(req, res) {
   }
 
   const { sessionId, order } = getOrCreateSession(requestedSessionId);
-  const reply = await generateReply(buildGroundedSystemPrompt(order), history || [], message.trim());
+  const reply = await generateReply(buildGroundedSystemPrompt(systemPrompt, order), history || [], message.trim());
 
   sendJson(res, 200, {
     reply,

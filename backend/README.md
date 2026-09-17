@@ -91,7 +91,9 @@ const DELIVERY_FEE = 3.0; // flat fee, delivery orders only
 
 Those same endpoints also return `promotionMessage`: a short note about the currently applied promotion (or `null` if none applies). See "Promotions" below.
 
-`/api/chat`'s `reply` comes from Anthropic's Messages API (`AI_MODEL`, called via the built-in `fetch` — no SDK dependency). CafeBot's system instructions (`prompts/system-prompt.md`) are grounded with the live `data/menu.json`, currently active promotions, `data/faq.json` (hours/location/wifi), and the session's current `orderSummary` before every call, so replies are never invented — see `buildGroundedSystemPrompt()`. If `ANTHROPIC_API_KEY` isn't set, or the API call fails, `reply` falls back to a plain apology message rather than fabricating an answer.
+`/api/chat`'s `reply` comes from Anthropic's Messages API (`AI_MODEL`, called via the built-in `fetch` — no SDK dependency). CafeBot's system instructions (`prompts/system-prompt.md`) are grounded with the live `data/menu.json`, currently active promotions, `data/faq.json` (hours/location/wifi), and the session's current `orderSummary` before every call, so replies are never invented — see `buildGroundedSystemPrompt()` and `generateReply()` in `aiReply.js`. If `ANTHROPIC_API_KEY` isn't set, or the API call fails, `reply` falls back to a plain apology message rather than fabricating an answer.
+
+`aiReply.js` is shared with `frontend/api/chat.js` — the stateless Vercel serverless version of this endpoint used when the frontend is deployed to Vercel (see the root `README.md`'s "Deploying" section). That version can't hold order/session state across requests, so it always grounds against a fresh empty order; this full backend is the only place multi-step order-building actually works.
 
 ### `GET /api/menu`
 

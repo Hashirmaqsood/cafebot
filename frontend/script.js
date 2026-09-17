@@ -1,9 +1,16 @@
-// CafeBot frontend — talks to the real backend's /api/chat endpoint.
+// CafeBot frontend — talks to the real /api/chat endpoint.
 // If the backend isn't reachable, sending a message shows an error
 // bubble rather than a fake reply.
 
-// Update this if the backend is deployed somewhere other than localhost.
-const API_BASE = "http://localhost:3000";
+// Locally, the frontend is opened separately from backend/server.js
+// (different origin/port), so it needs that full URL. Deployed on
+// Vercel, /api/chat is a serverless function bundled with this same
+// site (see frontend/api/chat.js), so a relative path is correct and
+// works regardless of the deployment's domain.
+const API_BASE =
+  location.protocol === "file:" || location.hostname === "localhost" || location.hostname === "127.0.0.1"
+    ? "http://localhost:3000"
+    : "";
 
 const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
