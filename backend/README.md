@@ -10,7 +10,7 @@ npm start
 
 Runs on `PORT` from the environment (default `3000`).
 
-**Note:** this server does not load `.env` files itself (no `dotenv` dependency — kept dependency-free on purpose). `../.env.example` is a reference for which variables exist; to actually set one, either export it in your shell before running `npm start`, or set it in your hosting platform's environment variable settings. Of the variables listed there, only `PORT` is read by the code today — `ANTHROPIC_API_KEY`, `AI_MODEL`, `AI_API_BASE_URL`, and `AI_MAX_TOKENS` are placeholders for the future AI-integration task and have no effect yet.
+**Note:** no `dotenv` dependency (kept dependency-free on purpose) — the server reads `../.env` itself on startup with a small built-in parser, without overriding any variable your shell or hosting platform already set. Copy `../.env.example` to `../.env` and fill in `ANTHROPIC_API_KEY` to enable real AI replies; `AI_MODEL` defaults to `claude-haiku-4-5-20251001` if left blank, `AI_API_BASE_URL` defaults to Anthropic's API, and `AI_MAX_TOKENS` defaults to `512`.
 
 ## Deploying
 
@@ -91,7 +91,7 @@ const DELIVERY_FEE = 3.0; // flat fee, delivery orders only
 
 Those same endpoints also return `promotionMessage`: a short note about the currently applied promotion (or `null` if none applies). See "Promotions" below.
 
-Currently returns a placeholder reply only — it does not call an AI provider yet. That's a separate, future task.
+`/api/chat`'s `reply` comes from Anthropic's Messages API (`AI_MODEL`, called via the built-in `fetch` — no SDK dependency). CafeBot's system instructions (`prompts/system-prompt.md`) are grounded with the live `data/menu.json`, currently active promotions, and the session's current `orderSummary` before every call, so replies are never invented — see `buildGroundedSystemPrompt()`. If `ANTHROPIC_API_KEY` isn't set, or the API call fails, `reply` falls back to a plain apology message rather than fabricating an answer.
 
 ### `POST /api/order/items`
 

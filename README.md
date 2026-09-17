@@ -9,16 +9,16 @@ A chatbot backend for a cafe: browse the menu, build an order (with size/customi
 
 ## Current status
 
-- **Backend** (`backend/`): a dependency-free Node.js API — menu/order management, promotions, pickup/delivery collection with address confirmation, deterministic pricing, and an explicit confirmation gate that saves confirmed orders to `data/orders.json`. See `backend/README.md` for the full endpoint list.
-- **Frontend** (`frontend/index.html`): a chat UI with mock messages — **not yet wired up to the backend or an AI model.**
+- **Backend** (`backend/`): a dependency-free Node.js API — menu/order management, promotions, pickup/delivery collection with address confirmation, deterministic pricing, an explicit confirmation gate that saves confirmed orders to `data/orders.json`, and a `/api/chat` endpoint that calls Anthropic's API (grounded with the real menu/promotions/order data) for CafeBot's replies. See `backend/README.md` for the full endpoint list.
+- **Frontend** (`frontend/index.html`): a chat UI with **scripted demo messages** — not yet wired up to the real `/api/chat` endpoint.
 - **Staff dashboard** (`frontend/staff.html`): lists saved orders and lets staff update their status. No authentication — local/trusted use only.
-- **Not yet implemented:** the actual AI/LLM call (CafeBot's replies are a placeholder today) and real checkout/payment processing.
+- **Not yet implemented:** wiring the frontend chat UI to the real backend (it currently talks to `/api/order/*` only through direct API calls, not through the chat box), and real checkout/payment processing.
 
 ## Folder structure
 
 ```
 cafebot/
-├── prompts/          # CafeBot's system prompt (for the future AI integration)
+├── prompts/          # CafeBot's system prompt (used to ground its AI replies)
 ├── data/             # menu.json, promotions.json (content) and orders.json (runtime data, gitignored)
 ├── frontend/         # customer chat UI (mock) + staff dashboard, static HTML/CSS/JS, no build step
 ├── backend/          # Node.js API — see backend/README.md
@@ -50,9 +50,7 @@ See `.env.example` for the full list. Copy it if you want a local reference:
 cp .env.example .env
 ```
 
-**Important:** the backend does not load `.env` files automatically (no `dotenv` dependency — kept dependency-free on purpose). `.env` is just a template/reference here. To actually set a variable, export it in your shell before running `npm start`, or set it in your hosting platform's environment variable settings.
-
-Of the variables listed, only `PORT` has any effect today. `ANTHROPIC_API_KEY`, `AI_MODEL`, `AI_API_BASE_URL`, and `AI_MAX_TOKENS` are placeholders reserved for when the backend is actually connected to an AI model — they do nothing yet. **Never commit a real `.env` file or real API keys** — `.gitignore` already excludes `.env` (and `.env.*`, keeping `.env.example` itself trackable).
+**Note:** no `dotenv` dependency (kept dependency-free on purpose) — the backend reads `.env` itself on startup, without overriding any variable your shell or hosting platform already set. Copy `.env.example` to `.env` and set `ANTHROPIC_API_KEY` to enable real AI replies; `AI_MODEL`, `AI_API_BASE_URL`, and `AI_MAX_TOKENS` are optional and have sensible defaults if left blank. **Never commit a real `.env` file or real API keys** — `.gitignore` already excludes `.env` (and `.env.*`, keeping `.env.example` itself trackable).
 
 ## Deploying
 
@@ -64,4 +62,4 @@ Of the variables listed, only `PORT` has any effect today. `ANTHROPIC_API_KEY`, 
 
 ## Status
 
-🚧 Ordering backend, mock chat UI, and staff dashboard are built. The actual AI integration (calling a real language model) and real checkout/payment are not implemented yet.
+🚧 Ordering backend (now with real AI replies via Anthropic's API), mock chat UI, and staff dashboard are built. Wiring the chat UI to the real backend, and real checkout/payment, are not implemented yet.
