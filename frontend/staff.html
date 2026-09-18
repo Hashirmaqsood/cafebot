@@ -129,15 +129,76 @@
       font-size: 0.75rem;
       background: #ece4da;
     }
+
+    #logoutBtn {
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    #loginScreen {
+      max-width: 320px;
+      margin: 80px auto 0;
+      padding: 24px;
+      background: #fffaf5;
+      border: 1px solid #e8ddd2;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    #loginScreen h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+
+    #loginScreen input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid #d8c6b8;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+    }
+
+    #loginBtn {
+      width: 100%;
+      background: #6f4e37;
+      color: #fff;
+      padding: 10px;
+    }
+
+    #loginError {
+      color: #a13d3d;
+      font-size: 0.85rem;
+      margin-top: 10px;
+      min-height: 1em;
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>CafeBot Staff Dashboard</h1>
-    <button id="refreshBtn">Refresh</button>
+    <div class="header-buttons">
+      <button id="refreshBtn" hidden>Refresh</button>
+      <button id="logoutBtn" hidden>Log out</button>
+    </div>
   </header>
 
-  <main>
+  <div id="loginScreen">
+    <h2>Staff Login</h2>
+    <form id="loginForm">
+      <input type="password" id="loginPassword" placeholder="Admin password" autocomplete="current-password" required />
+      <button type="submit" id="loginBtn">Log in</button>
+      <div id="loginError"></div>
+    </form>
+  </div>
+
+  <main id="dashboard" hidden>
     <div id="status">Loading orders...</div>
     <div id="orders"></div>
   </main>
@@ -151,6 +212,78 @@
     const statusEl = document.getElementById("status");
     const ordersEl = document.getElementById("orders");
     const refreshBtn = document.getElementById("refreshBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loginScreen = document.getElementById("loginScreen");
+    const loginForm = document.getElementById("loginForm");
+    const loginPassword = document.getElementById("loginPassword");
+    const loginError = document.getElementById("loginError");
+    const dashboard = document.getElementById("dashboard");
+
+    // Kept only in sessionStorage (cleared when the tab closes) — never
+    // in a cookie or localStorage, so it doesn't linger across sessions.
+    function getToken() {
+      return sessionStorage.getItem("cafebot_staff_token") || "";
+    }
+
+    function setToken(token) {
+      if (token) sessionStorage.setItem("cafebot_staff_token", token);
+      else sessionStorage.removeItem("cafebot_staff_token");
+    }
+
+    function showLogin(message) {
+      setToken("");
+      loginScreen.hidden = false;
+      dashboard.hidden = true;
+      refreshBtn.hidden = true;
+      logoutBtn.hidden = true;
+      loginError.textContent = message || "";
+      loginPassword.focus();
+    }
+
+    function showDashboard() {
+      loginScreen.hidden = true;
+      dashboard.hidden = false;
+      refreshBtn.hidden = false;
+      logoutBtn.hidden = false;
+    }
+
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      loginError.textContent = "";
+
+      try {
+        const res = await fetch(`${API_BASE}/api/staff/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: loginPassword.value }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          loginError.textContent = data.error || "Login failed.";
+          return;
+        }
+
+        setToken(data.token);
+        loginPassword.value = "";
+        showDashboard();
+        loadOrders();
+      } catch (err) {
+        loginError.textContent = "Couldn't reach the server. Please try again.";
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await fetch(`${API_BASE}/api/staff/logout`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
+      } catch {
+        // Logging out locally still matters even if the request fails.
+      }
+      showLogin();
+    });
 
     function formatFulfillment(fulfillment) {
       if (!fulfillment || !fulfillment.type) return "Not set";
@@ -253,7 +386,13 @@
       statusEl.textContent = "Loading orders...";
 
       try {
-        const res = await fetch(`${API_BASE}/api/staff/orders`);
+        const res = await fetch(`${API_BASE}/api/staff/orders`, {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        if (res.status === 401) {
+          showLogin("Your session expired — please log in again.");
+          return;
+        }
         if (!res.ok) throw new Error(`Request failed (${res.status})`);
         const data = await res.json();
         renderOrders(data.orders || []);
@@ -266,9 +405,13 @@
       try {
         const res = await fetch(`${API_BASE}/api/staff/orders/${encodeURIComponent(orderId)}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
           body: JSON.stringify({ status }),
         });
+        if (res.status === 401) {
+          showLogin("Your session expired — please log in again.");
+          return;
+        }
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
           throw new Error(data.error || `Request failed (${res.status})`);
@@ -281,7 +424,13 @@
     }
 
     refreshBtn.addEventListener("click", loadOrders);
-    loadOrders();
+
+    if (getToken()) {
+      showDashboard();
+      loadOrders();
+    } else {
+      showLogin();
+    }
   </script>
 </body>
 </html>

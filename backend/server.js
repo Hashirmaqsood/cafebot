@@ -25,7 +25,10 @@
 // saved to data/orders.json (orderStorage.js) with a unique orderId,
 // timestamp, and status — a draft is never saved as if it were placed.
 // A small set of staff endpoints (/api/staff/orders) list those saved
-// orders and let staff move one through its status lifecycle.
+// orders and let staff move one through its status lifecycle. Staff
+// endpoints require a Bearer token from POST /api/staff/login (see
+// staffAuth.js) — a single shared admin password, no per-staff
+// accounts, appropriate for a small cafe's one admin login.
 
 const http = require("http");
 const fs = require("fs");
@@ -49,6 +52,7 @@ const { buildOrderSummary } = require("./orderSummary");
 const { confirmOrder } = require("./confirmation");
 const { getAllOrders, updateOrderStatus } = require("./orderStorage");
 const { buildGroundedSystemPrompt, generateReply } = require("./aiReply");
+const { login: staffLogin, logout: staffLogout, isValidToken } = require("./staffAuth");
 
 // No dotenv dependency (kept dependency-free on purpose) — read .env
 // ourselves. Values already set in the real environment (e.g. by a
@@ -577,11 +581,58 @@ async function handleGetFaq(req, res) {
   sendJson(res, 200, getFaqData());
 }
 
+// Extracts the token from "Authorization: Bearer <token>" and checks
+// it. Sends a 401 and returns false if missing/invalid — callers
+// should stop handling the request when this returns false.
+function requireStaffAuth(req, res) {
+  const header = req.headers["authorization"] || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+
+  if (!isValidToken(token)) {
+    sendJson(res, 401, { error: "Not authenticated. Please log in." });
+    return false;
+  }
+  return true;
+}
+
+async function handleStaffLogin(req, res) {
+  let parsed;
+  try {
+    parsed = await readJsonBody(req);
+  } catch {
+    return sendJson(res, 400, { error: "Invalid JSON body" });
+  }
+
+  const { password } = parsed;
+
+  if (typeof password !== "string" || !password) {
+    return sendJson(res, 400, { error: "'password' is required and must be a non-empty string" });
+  }
+
+  const token = staffLogin(password);
+
+  if (!token) {
+    return sendJson(res, 401, { error: "Incorrect password." });
+  }
+
+  sendJson(res, 200, { token });
+}
+
+async function handleStaffLogout(req, res) {
+  const header = req.headers["authorization"] || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  staffLogout(token);
+  sendJson(res, 200, { loggedOut: true });
+}
+
 async function handleGetStaffOrders(req, res) {
+  if (!requireStaffAuth(req, res)) return;
   sendJson(res, 200, { orders: getAllOrders() });
 }
 
 async function handleUpdateStaffOrderStatus(req, res, orderId) {
+  if (!requireStaffAuth(req, res)) return;
+
   let parsed;
   try {
     parsed = await readJsonBody(req);
@@ -613,7 +664,7 @@ const server = http.createServer((req, res) => {
     res.writeHead(204, {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
     });
     return res.end();
   }
@@ -659,6 +710,12 @@ const server = http.createServer((req, res) => {
   }
   if (req.method === "GET" && pathname === "/api/faq") {
     return handleGetFaq(req, res);
+  }
+  if (req.method === "POST" && pathname === "/api/staff/login") {
+    return handleStaffLogin(req, res);
+  }
+  if (req.method === "POST" && pathname === "/api/staff/logout") {
+    return handleStaffLogout(req, res);
   }
   if (req.method === "GET" && pathname === "/api/staff/orders") {
     return handleGetStaffOrders(req, res);

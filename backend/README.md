@@ -16,7 +16,7 @@ Runs on `PORT` from the environment (default `3000`).
 
 - Deploy this `backend/` folder as a Node.js web service (start command `npm start`); the platform should provide `PORT` itself (most do) or you can set it explicitly.
 - `data/orders.json` (one level up) is where confirmed orders are saved. It's plain-file storage recreated automatically if missing — fine for a low-cost demo, but note that most hosting platforms have an ephemeral filesystem, so its contents can be lost on redeploy or restart unless your host provides a persistent disk/volume. It also contains customer PII (name, phone, address), so it's gitignored and must never be committed.
-- The staff dashboard (`frontend/staff.html`) has no authentication — it's meant for local/trusted use only. Don't expose it on a public URL without adding your own access control first.
+- The staff dashboard (`frontend/staff.html`) requires logging in with `ADMIN_PASSWORD` (see `staffAuth.js` and the `/api/staff/*` endpoints below). Set that variable wherever the backend runs — an unset/blank password refuses all staff access rather than allowing it.
 - Every response already sends permissive CORS headers (`Access-Control-Allow-Origin: *`) so a frontend hosted elsewhere can call this API; if you deploy the backend somewhere other than `http://localhost:3000`, update the `API_BASE` constant near the top of `frontend/staff.html`'s `<script>` to point at it.
 
 ## Endpoint
@@ -571,7 +571,37 @@ The moment (and only the moment) `confirmOrder()` classifies a reply as confirme
 
 `data/orders.json` is a plain JSON array — no database — and is only ever appended to by this one function.
 
+### `POST /api/staff/login`
+
+Exchanges the admin password for a session token. This is the only way to obtain a token — every other `/api/staff/*` endpoint requires one.
+
+**Request body:**
+
+```json
+{ "password": "..." }
+```
+
+**Response body — success:**
+
+```json
+{ "token": "0f3828ff-8c8a-4b07-8fd2-dadd3a062a8b" }
+```
+
+**Response body — wrong password, or `ADMIN_PASSWORD` isn't set:**
+
+```json
+{ "error": "Incorrect password." }
+```
+
+Tokens are plain random UUIDs kept in an in-memory `Set` (`staffAuth.js`) — no JWT, no expiry logic, cleared on server restart. Send the token on every subsequent staff request as `Authorization: Bearer <token>`.
+
+### `POST /api/staff/logout`
+
+Invalidates a token (send it as `Authorization: Bearer <token>`). Always responds `{ "loggedOut": true }`, even if the token was already invalid.
+
 ### `GET /api/staff/orders`
+
+Requires `Authorization: Bearer <token>` from a successful login — responds `401 { "error": "Not authenticated. Please log in." }` otherwise.
 
 Returns every saved order (from `data/orders.json`), newest first, for the staff dashboard (`frontend/staff.html`).
 
@@ -593,7 +623,7 @@ Returns every saved order (from `data/orders.json`), newest first, for the staff
 
 ### `PATCH /api/staff/orders/:orderId`
 
-Updates one saved order's status. This is the only way a saved order's status can change after it's placed.
+Requires `Authorization: Bearer <token>`, same as above. Updates one saved order's status. This is the only way a saved order's status can change after it's placed.
 
 **Request body:**
 

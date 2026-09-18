@@ -13,7 +13,7 @@ A chatbot backend for a cafe: browse the menu, build an order (with size/customi
 - **Serverless functions** (`frontend/api/`): a second, stateless implementation of `/api/menu`, `/api/faq`, and `/api/chat` as Vercel serverless functions, so the homepage works when deployed to a static host like Vercel (which can't run `backend/`'s persistent server). They reuse the same `backend/menu.js`/`promotions.js`/`faq.js`/`aiReply.js` modules — one source of truth for the data and the AI call — but **can't hold order/session state across requests**, so `/api/order/*` and `/api/staff/*` are only on the real backend. See "Deploying" below.
 - **Homepage** (`frontend/index.html`): the cafe's website (and default page, so static hosts like Vercel serve it at "/") — hero section, a menu grid and hours/location loaded live from `/api/menu` and `/api/faq`, CafeBot as a floating chat widget wired to the real `/api/chat` endpoint, and a real **Add to Cart / checkout flow** (`frontend/cart.js`) wired to `/api/order/*` — cart, pickup/delivery, address confirmation, and order confirmation all work against the real backend. `frontend/script.js` auto-detects whether to call the local backend (`localhost:3000`) or same-origin serverless functions, based on the page's own hostname; the cart only works against the full backend (see "Deploying" below), since it needs order/session state the serverless functions can't hold.
 - **Standalone chat page** (`frontend/demo.html`): a full-page chat UI with **scripted demo messages only** — kept as-is for a quick visual demo; not wired to the backend.
-- **Staff dashboard** (`frontend/staff.html`): lists saved orders and lets staff update their status. No authentication — local/trusted use only.
+- **Staff dashboard** (`frontend/staff.html`): password-protected — logs in against `ADMIN_PASSWORD` (via `POST /api/staff/login`), then lists saved orders (including the customer's name/phone/address) and lets staff update their status.
 - **Not yet implemented:** real payment processing (checkout ends with "pay at the counter" / "pay on delivery").
 
 ## Folder structure
@@ -73,7 +73,7 @@ Two ways to deploy this, with a real tradeoff between them:
 3. `data/orders.json` is plain-file storage, not a database, and is recreated automatically if missing — but most hosting platforms have an ephemeral filesystem, so it can be lost on redeploy/restart unless your host gives you a persistent disk. It also holds customer PII (name, phone, address), so it's gitignored — never commit it.
 
 **Either way:**
-- `frontend/staff.html` has no authentication. Don't publish it on a public URL without adding your own access control.
+- Set `ADMIN_PASSWORD` wherever the backend runs — without it, `/api/staff/*` refuses all requests (a blank password never grants access). The dashboard session token lives only in `sessionStorage` (cleared when the tab closes) and in an in-memory token set on the server (cleared on restart) — there's no "remember me," and only one shared password rather than per-staff accounts.
 - The backend already sends permissive `Access-Control-Allow-Origin: *` headers, so a frontend hosted on a different domain/port can call it without extra configuration.
 
 ## Status
