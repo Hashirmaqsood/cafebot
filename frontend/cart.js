@@ -286,7 +286,11 @@ async function addToCart(itemId, size) {
   if (!ok || data.needsInput) {
     openCart();
     goTo("cart", data.error || data.message);
-  } else if (!cartModal.hidden) {
+  } else {
+    // Always surface the cart on a successful add — silently updating
+    // just the header badge left customers unsure whether anything
+    // happened at all.
+    openCart();
     goTo("cart");
   }
 }
